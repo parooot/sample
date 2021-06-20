@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset=utf-8>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0, user-scalable=yes">
+  <title>Html5 位置情報</title>
+
+
+  <form action="result.php" method="post">
+    <input type="lati" name="緯度" value="">
+    <input type="submit" value="送信">
+  </form>
+  
+  <script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
+  <script>
+      function initMap() {             // google maps Javascript と同期
+        if (navigator.geolocation) {   // 現在の位置情報を取得する
+          navigator.geolocation.getCurrentPosition(successCallback, errorCallback,option);
+        } else {
+          alert('navigator.geolocation は利用出来ません');
+        }  
+      }; //  initMap()  --------------
+      
+      // 現在の位置情報を取得時の処置  ------------------
+      function successCallback(position) {
+        var lati = position.coords.latitude.toFixed(5);
+        var long = position.coords.longitude.toFixed(5);
+        var g_txt = "緯度：" + lati + "<br>";
+        g_txt += "経度：" + long + "<br>";  
+        g_txt += "同精度：" + position.coords.accuracy + " m<br>";
+        g_txt += "高度：" + position.coords.altitude + " m<br>";
+
+       const lati2 = lati;
+       const long2 = long;
+       const position = position.coords.accuracy;
+       const altitude =  position.coords.altitude;
+
+        location.href = "http://index2.html/result.php?lati2?long2?position?altitude="+lati2+long2+position+altitude;
+
+        document.getElementById("txt_result").innerHTML = g_txt; // 位置の書き出し
+        // Google Mapsに書き出し ------------------
+        var latlng = new google.maps.LatLng( lati,long );        // 地図の中心
+        var mapobj = new google.maps.Map( document.getElementById('gmap'), {
+            zoom: 15 ,
+            center:latlng
+        });
+        new google.maps.Marker( { map:mapobj , position:latlng } );  // マーカーセット
+      }; //  successCallback(position) ---------------
+
+
+
+
+ 
+      // 位置情報が取得できない場合の処置 ---------------
+      function errorCallback(error) {
+        var err_msg = "";
+        switch(error.code){
+          case 0:
+            err_msg = "原因不明のエラーが発生しました";
+            break;
+          case 1:
+            err_msg = "位置情報の利用が許可されていません";
+            break;
+          case 2:
+            err_msg = "デバイスの位置が取得できません";
+            break;
+          case 3:
+            err_msg = "タイムアウトしました";
+            break;
+        }
+        document.getElementById("txt_result").innerHTML = err_msg;
+      }; //  errorCallback(error) ----------------------
+      
+      var option =  {                 // 位置取得オプション
+            "enableHighAccuracy":true,
+            "timeout":8000,
+            "maximumAge":60000,
+          }
+  
+    
+  </script>
+  <style>
+    h4,#txt_result{ width:90%; margin:0 auto; }
+    #gmap{ width:90%; height:320px; margin:0 auto; }
+  </style>
+</head>
+
+
+
+<body>
+  <h4>　【現在位置】</h4>
+  <div id="txt_result">ここに位置情報</div><br>
+  <div id="gmap">ここに地図</div>
+</body>
+</html>
